@@ -1,0 +1,40 @@
+import win32gui
+import win32con
+
+def set_window_topmost(window_handle):
+    win32gui.SetWindowPos(window_handle, win32con.HWND_TOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE | win32con.SWP_NOSIZE)
+
+def find_window_by_title(title):
+    def callback(hwnd, hwnds):
+        if win32gui.IsWindowVisible(hwnd) and title in win32gui.GetWindowText(hwnd):
+            hwnds.append(hwnd)
+        return True
+    window_handles = []
+    win32gui.EnumWindows(callback, window_handles)
+    return window_handles
+
+def set_window_size(hwnd, width, height):
+    flags = win32con.SWP_NOMOVE | win32con.SWP_NOZORDER
+    win32gui.SetWindowPos(hwnd, win32con.HWND_TOP, 0, 0, width, height, flags)
+
+def set_window_position(hwnd, x, y):
+    flags = win32con.SWP_NOSIZE | win32con.SWP_NOZORDER
+    win32gui.SetWindowPos(hwnd, 0, x, y, 0, 0, flags)
+
+program_name = "Roblox"
+window_handles = find_window_by_title(program_name)
+
+if window_handles:
+    for handle in window_handles:
+        set_window_topmost(handle)
+        win32gui.ShowWindow(handle, win32con.SW_NORMAL)
+        hwnd = win32gui.FindWindow(None, program_name)
+
+        if hwnd:
+            set_window_position(hwnd, 10, 10)
+            set_window_size(hwnd, 800, 700)
+        else:
+            print(f"ไม่พบหน้าต่างที่มีชื่อ '{program_name}'")
+
+else:
+    print(f"ไม่พบหน้าต่างของโปรแกรมที่มีชื่อ '{program_name}'")
